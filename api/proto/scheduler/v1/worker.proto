@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package scheduler.v1;
+
+option go_package = "github.com/muthuku37/distributed-scheduler/gen/scheduler/v1;schedulerv1";
+
+import "google/protobuf/struct.proto";
+
+// WorkerGateway is hosted by the scheduler. A worker opens this stream when it
+// starts and keeps the stream open while it is available for work.
+service WorkerGateway {
+  rpc Connect(stream WorkerEvent) returns (stream CoordinatorCommand);
+}
+
+// WorkerEvent contains messages sent from a worker to the coordinator.
+message WorkerEvent {
+  oneof event {
+    RegisterWorker register = 1;
+    Heartbeat heartbeat = 2;
+    JobUpdate job_update = 3;
+  }
+}
+
+// CoordinatorCommand contains messages sent from the coordinator to a worker.
+message CoordinatorCommand {
+  oneof command {
+    JobAssignment assignment = 1;
+  }
+}
+
+// RegisterWorker must be the first event a worker sends on a new connection.
+message RegisterWorker {
+  string worker_id = 1;
+  uint32 capacity = 2;
+  repeated TaskType supported_tasks = 3;
+}
+
+// Heartbeat tells the coordinator that the worker connection is healthy.
+message Heartbeat {}
+
+// JobAssignment asks the worker to execute one job.
+message JobAssignment {
+  string job_id = 1;
+  TaskType task = 2;
+  google.protobuf.Struct payload = 3;
+}
+
+// JobUpdate reports execution progress or a final result to the coordinator.
+message JobUpdate {
+  string job_id = 1;
+  JobState state = 2;
+  string output = 3;
+  string error_message = 4;
+}
+
+enum TaskType {
+  TASK_TYPE_UNSPECIFIED = 0;
+  TASK_TYPE_GENERATE_REPORT = 1;
+  TASK_TYPE_SEND_EMAIL = 2;
+  TASK_TYPE_SEND_NOTIFICATION = 3;
+}
+
+enum JobState {
+  JOB_STATE_UNSPECIFIED = 0;
+  JOB_STATE_ACCEPTED = 1;
+  JOB_STATE_RUNNING = 2;
+  JOB_STATE_SUCCEEDED = 3;
+  JOB_STATE_FAILED = 4;
+}

@@ -1,0 +1,27 @@
+# Local environment files. Keep the documented template.
+.env
+.env.*
+!.env.example
+
+# Go build and test output.
+/bin/
+*.test
+*.out
+coverage.out
+coverage.html
+
+# Delve debugger output.
+__debug_bin*
+
+# Local runtime data and temporary files.
+/data/
+/tmp/
+*.log
+
+# Local agent/editor metadata that is not project configuration.
+/.agents/
+/.codex/
+
+# Operating-system files.
+.DS_Store
+Thumbs.db

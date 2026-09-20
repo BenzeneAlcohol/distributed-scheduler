@@ -1,0 +1,13 @@
+.git
+.gitignore
+.agents
+.codex
+.vscode
+.env*
+bin
+data
+tmp
+__debug_bin*
+*.log
+coverage.out
+coverage.html
